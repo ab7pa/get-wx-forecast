@@ -1,0 +1,58 @@
+#!/usr/bin/lua
+-- Program:  get-wx-forecast
+-- Purpose:  Retrieve the current NWS weather forecast for a zone
+-- Assumptions:  The node must have an Internet connection in order to query NWS api.
+
+require("luci.jsonc")
+require("aredn.utils")
+require("nixio")
+
+-- SET YOUR NWS ZONE HERE
+wx_zone = "AZZ548"
+
+-- Initialize variables
+wx_url = "https://api.weather.gov/zones/Feature/" .. wx_zone .. "/forecast"
+wx_forecast_file   = "/www/wx-forecast.html"
+connect_timeout = 5
+speed_time      = 10
+speed_limit     = 1000
+os.execute("/bin/cat /dev/null > " .. wx_forecast_file)
+wx_pre = [[
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head><title>Current Forecast</title></head>
+<body>
+<style>
+ p {max-width:50%; font-family:sans-serif;} 
+</style>
+<h2>Current Weather Forecast: PHX East Valley</h2>
+]]
+wx_post = "</body></html>"
+
+-- Query weather.gov API for zone forecast
+local wx = {}
+wx = capture("/usr/bin/curl --silent --retry 3 --connect-timeout " .. connect_timeout .. " --speed-time " .. speed_time .. " --speed-limit " .. speed_limit .. " " .. wx_url .. " 2> /dev/null")
+if wx then
+  local wxforecast = luci.jsonc.parse(wx)
+  if wxforecast then   -- Has WX forecast info
+    local f = io.open(wx_forecast_file, "w")
+    if f then
+      f:write( wx_pre )
+      f:write( "<p><b>Zone:</b> " .. wxforecast.properties.zone .. "</p>" )
+      f:write( "<p><b>Updated:</b> " .. wxforecast.properties.updated .. "</p>" )
+      f:write( "<p><b>" .. wxforecast.properties.periods[1].name .. ":</b> " .. wxforecast.properties.periods[1].detailedForecast .. "</p>" )
+      f:write( "<p><b>" .. wxforecast.properties.periods[2].name .. ":</b> " .. wxforecast.properties.periods[2].detailedForecast .. "</p>" )
+      f:write( wx_post )
+      f:close()
+    end
+  else
+    local f = io.open(wx_forecast_file, "w")
+    if f then
+      f:write( wx_pre )
+      f:write( "<p>No current forecast available.</p>" )
+      f:write( wx_post )
+      f:close()
+    end
+  end
+end
+

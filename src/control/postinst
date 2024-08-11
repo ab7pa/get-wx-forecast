@@ -1,0 +1,6 @@
+#!/bin/sh
+
+/etc/cron.hourly/get-wx-forecast
+echo "<br>Edit /etc/cron.hourly/get-wx-forecast to specify your National Weather Service ZONE.<br>"
+
+exit 0

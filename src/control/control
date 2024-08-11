@@ -1,0 +1,10 @@
+Package: get-wx-forecast
+Version: 0.1
+Depends: curl
+Provides:
+Source: package/get-wx-forecast
+Section: net
+Priority: optional
+Maintainer: Steve Lewis (AB7PA)
+Architecture: all
+Description: Tool for NWS forecast query by zone
