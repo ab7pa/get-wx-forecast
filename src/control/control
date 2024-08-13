@@ -1,5 +1,5 @@
 Package: get-wx-forecast
-Version: 0.1
+Version: 0.2
 Depends: curl
 Provides:
 Source: package/get-wx-forecast
