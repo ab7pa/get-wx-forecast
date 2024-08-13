@@ -42,6 +42,7 @@ if wx then
       f:write( "<p><b>Updated:</b> " .. wxforecast.properties.updated .. "</p>" )
       f:write( "<p><b>" .. wxforecast.properties.periods[1].name .. ":</b> " .. wxforecast.properties.periods[1].detailedForecast .. "</p>" )
       f:write( "<p><b>" .. wxforecast.properties.periods[2].name .. ":</b> " .. wxforecast.properties.periods[2].detailedForecast .. "</p>" )
+      f:write( "<p><b>" .. wxforecast.properties.periods[3].name .. ":</b> " .. wxforecast.properties.periods[3].detailedForecast .. "</p>" )
       f:write( wx_post )
       f:close()
     end
