@@ -1,0 +1,57 @@
+#!/usr/bin/ucode
+/* 
+ * Program: get-wx-forecast.uc
+ * Purpose: Get the current NWS weather forecast for a specific zone
+ * SET YOUR NWS ZONE in the WX_ZONE VARIABLE BELOW
+ */
+const WX_ZONE = "AZZ548";
+
+import * as fs from "fs";
+// NWS URL
+const WX_URL = sprintf("https://api.weather.gov/zones/Feature/%s/forecast", WX_ZONE);
+// Test for Internet connection, exit if none
+const p = fs.popen("exec /bin/ping -W1 -c1 8.8.8.8");
+if (p) {
+  const d = p.read("all");
+  p.close();
+  if (index(d, "1 packets received") == -1) {
+    // No Internet
+    exit();
+  }
+}
+
+// Query for the current forecast info
+const wx = fs.popen(`exec /usr/bin/curl --silent --retry 3 --connect-timeout 5 --speed-time 10 --speed-limit 1000 ${WX_URL}`);
+// Parse forecast and write html file
+if(wx) { // NWS forecast returned
+  const j = json(wx.read("all"));
+  wx.close();
+
+  f = fs.open("/www/wx-forecast.html", "w");
+  if(f) {
+    f.write("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
+    f.write("<html> <head><title>Current Forecast</title></head> <body>\n");
+    f.write("<style> p {max-width:50%; font-family:sans-serif;} </style>\n");
+    f.write("<h2>Current Weather Forecast: PHX East Valley</h2>\n");
+    f.write(sprintf("<p><b>Updated:</b> %s</p>\n", j.properties.updated));
+    f.write(sprintf("<p><b>%s</b>: %s\n", j.properties.periods[1].name, j.properties.periods[1].detailedForecast));
+    f.write(sprintf("<p><b>%s</b>: %s\n", j.properties.periods[2].name, j.properties.periods[2].detailedForecast));
+    f.write(sprintf("<p><b>%s</b>: %s\n", j.properties.periods[3].name, j.properties.periods[3].detailedForecast));
+    f.write(sprintf("<p><b>%s</b>: %s\n", j.properties.periods[4].name, j.properties.periods[4].detailedForecast));
+    f.write("</body></html>\n");
+  }
+  f.close();
+
+} else { // No forecast available
+  f = fs.open("/www/wx-forecast.html", "w");
+  if(f) {
+    f.write("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
+    f.write("<html> <head><title>Current Forecast</title></head> <body>\n");
+    f.write("<style> p {max-width:50%; font-family:sans-serif;} </style>\n");
+    f.write("<h2>Current Weather Forecast: PHX East Valley</h2>\n");
+    f.write("<p>No weather forecast available</p>\n");
+    f.write("</body></html>\n");
+  }
+  f.close();
+}
+
