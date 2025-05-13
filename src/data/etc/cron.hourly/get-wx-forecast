@@ -36,10 +36,10 @@ if(wx) { // NWS forecast returned
     f.write("<style> p {max-width:50%; font-family:sans-serif;} </style>\n");
     f.write("<h2>Current Weather Forecast: PHX East Valley</h2>\n");
     f.write(sprintf("<p><b>Updated:</b> %s</p>\n", j.properties.updated));
-    f.write(sprintf("<p><b>%s</b>: %s\n", j.properties.periods[1].name, j.properties.periods[1].detailedForecast));
-    f.write(sprintf("<p><b>%s</b>: %s\n", j.properties.periods[2].name, j.properties.periods[2].detailedForecast));
-    f.write(sprintf("<p><b>%s</b>: %s\n", j.properties.periods[3].name, j.properties.periods[3].detailedForecast));
-    f.write(sprintf("<p><b>%s</b>: %s\n", j.properties.periods[4].name, j.properties.periods[4].detailedForecast));
+    f.write(sprintf("<p><b>%s</b>: %s\n", j.properties.periods[0].name, j.properties.periods[1].detailedForecast));
+    f.write(sprintf("<p><b>%s</b>: %s\n", j.properties.periods[1].name, j.properties.periods[2].detailedForecast));
+    f.write(sprintf("<p><b>%s</b>: %s\n", j.properties.periods[2].name, j.properties.periods[3].detailedForecast));
+    f.write(sprintf("<p><b>%s</b>: %s\n", j.properties.periods[3].name, j.properties.periods[4].detailedForecast));
     f.write("</body></html>\n");
   }
   f.close();
