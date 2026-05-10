@@ -1,15 +1,19 @@
 #!/usr/bin/ucode
 /* 
- * Program: get-wx-forecast.uc
+ * Program: get-wx-forecast
  * Purpose: Get the current NWS weather forecast for a specific zone
  * SET YOUR NWS ZONE in the WX_ZONE VARIABLE BELOW
+ * Install this program in /etc/cron.hourly
+ * Program puts weather alert into /www/wx-forecast.html
  */
 const WX_ZONE = "AZZ548";
 
 import * as fs from "fs";
 import * as log from 'log';
+
 // NWS URL
 const WX_URL = sprintf("https://api.weather.gov/zones/Feature/%s/forecast", WX_ZONE);
+
 // Test for Internet connection, exit if none
 const p = fs.popen("exec /bin/ping -W1 -c1 8.8.8.8 2>/dev/null");
 if (p) {
@@ -23,6 +27,8 @@ if (p) {
 
 // Query for the current forecast info
 const wx = fs.popen(`exec /usr/bin/curl --silent --retry 3 --connect-timeout 5 --speed-time 10 --speed-limit 1000 ${WX_URL}`);
+sleep(3000);
+
 // Parse forecast and write html file
 if(wx) { // NWS forecast returned
 //  log.syslog(log.LOG_INFO, "get-wx-forecast: forecast retrieved");
